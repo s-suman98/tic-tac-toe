@@ -5,12 +5,21 @@ import lombok.Getter;
 import org.com.enu.Symbol;
 import org.com.model.Cell;
 
-@Data
+
 @Getter
 public class Board {
 
-private int size;
-private Cell[][] cells;   // Owns cells
+private final int size;
+private final Cell[][] cells;   // Owns cells
+
+
+private int[] rowCount;   //effective
+private int[] colCount;   //effective
+private int totalCount;    //total filled count
+
+private int mainDiagonalCount;
+private int crossDiagonalCOunt;
+
 
  public Board (int size) {
 	this.size = size;
@@ -22,17 +31,14 @@ private Cell[][] cells;   // Owns cells
 			k++;
 		}
 	}
+	
+	
+	this.rowCount=new int[this.size];
+    this.colCount=new int[this.size];
 }
 
 public boolean isFull () {
-	for ( int i = 0; i < size; i++ ) {
-		for ( int j = 0; j < size; j++ ) {
-			if ( cells[ i ][ j ].getSymbol () == Symbol.E ) {
-				return false;
-			}
-		}
-	}
-	return true;
+	 return this.size*this.size==totalCount;
 	
 }
 
@@ -57,8 +63,22 @@ public boolean isValid (int cr, int cc) {
 	return true;
 }
 
-public void placeSymbol (int cr, int cc, Cell cell) {
-	cells[ cr ][ cc ] = cell;
+public void placeSymbol(int cr, int cc, Cell cell) {
+	cells[cr][cc] = cell;
+	totalCount++;
+	
+	int value = cell.getSymbol() == Symbol.X ? 1 : -1;
+	
+	rowCount[cr] += value;
+	colCount[cc] += value;
+	
+	if (cr == cc) {
+		mainDiagonalCount += value;
+	}
+	
+	if (cr + cc == size - 1) {
+		crossDiagonalCOunt += value;
+	}
 }
 
 public void printBoard () {
@@ -75,12 +95,8 @@ public boolean isAllSameInRow (int r) {
 	if ( symbol == Symbol.E ) {
 		return false;
 	}
-	for ( int c = 1; c < this.size; c++ ) {
-		if ( cells[ r ][ c ].getSymbol () != symbol ) {
-			return false;
-		}
-	}
-	return true;
+	
+	return Math.abs(rowCount[r])==this.size;
 	
 }
 
@@ -89,12 +105,7 @@ public boolean isAllSameInCol (int c) {
 	if ( symbol == Symbol.E ) {
 		return false;
 	}
-	for ( int r = 1; r < this.size; r++ ) {
-		if ( cells[ r ][ c ].getSymbol () != symbol ) {
-			return false;
-		}
-	}
-	return true;
+	return Math.abs(colCount[c])==this.size;
 }
 
 
@@ -103,14 +114,7 @@ public boolean isAllMainDiagonalSame () {
 	if ( symbol == Symbol.E ) {
 		return false;
 	}
-	for ( int i = 0; i < this.size; i++ ) {
-		for ( int j = 0; j < this.size; j++ ) {
-			if ( i == j && cells[ i ][ j ].getSymbol () != symbol ) {
-				return false;
-			}
-		}
-	}
-	return true;
+	   return this.mainDiagonalCount==this.size;
 }
 
 public boolean isAllSecDiagonalSame () {
@@ -118,13 +122,7 @@ public boolean isAllSecDiagonalSame () {
 	if ( symbol == Symbol.E ) {
 		return false;
 	}
-	for ( int i = 0; i < this.size; i++ ) {
-		for ( int j = 0; j < this.size; j++ ) {
-			if ( (i + j == this.size - 1) && cells[ i ][ j ].getSymbol () != symbol ) {
-				return false;
-			}
-		}
-	}
-	return true;
+	
+	return this.crossDiagonalCOunt==this.size;
 }
 }
