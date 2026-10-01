@@ -1,0 +1,8 @@
+package org.com.enu;
+
+public enum GameStatus {
+	IN_PROGRESS,
+	DRAW,
+   WINNER_X,
+   WINNER_O
+}
